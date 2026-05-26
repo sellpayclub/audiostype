@@ -3,14 +3,16 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Audio 2</title>
+<title>Audio 1</title>
 <style>
-  html,body{margin:0;padding:0;background:transparent;overflow:hidden;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif;}
+  *{margin:0;padding:0;box-sizing:border-box;}
+  html,body{background:#000000;overflow:hidden;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif;height:100%;}
+  body{display:flex;align-items:flex-start;justify-content:flex-start;padding:6px 0 0 0;}
   .ig-audio-player{
     display:flex;align-items:center;gap:10px;
     background:#7C3AED;border-radius:22px;
     padding:8px 14px 8px 8px;max-width:300px;width:calc(100% - 8px);
-    box-sizing:border-box;user-select:none;margin:4px;
+    box-sizing:border-box;user-select:none;margin-left:4px;
   }
   .iga-btn{
     width:34px;height:34px;border-radius:50%;border:none;
@@ -35,36 +37,32 @@
 </div>
 <script>
 (function(){
-  var p = document.querySelector('.ig-audio-player');
-  var audio = p.querySelector('.iga-audio');
-  var btn = p.querySelector('.iga-btn');
-  var icon = p.querySelector('.iga-icon');
-  var wave = p.querySelector('.iga-wave');
-  var timeEl = p.querySelector('.iga-time');
-
-  var heights = [4,7,11,15,20,26,22,16,12,18,25,30,24,17,10,14,21,28,23,15,9,13,19,26,29,22,14,8,12,18,24,20,13,7,11,16,22,17,10,6];
-  heights.forEach(function(h){
-    var b=document.createElement('div'); b.className='iga-bar'; b.style.height=h+'px'; wave.appendChild(b);
-  });
-  var bars = wave.querySelectorAll('.iga-bar');
-
-  function fmt(s){ s=isFinite(s)?s:0; var m=Math.floor(s/60),sec=Math.floor(s%60); return m+':'+(sec<10?'0':'')+sec; }
-  function playIcon(){ icon.innerHTML='<polygon points="0,0 12,7 0,14"/>'; }
-  function pauseIcon(){ icon.innerHTML='<rect x="1" y="0" width="3.5" height="14"/><rect x="7.5" y="0" width="3.5" height="14"/>'; }
+  var p=document.querySelector('.ig-audio-player');
+  var audio=p.querySelector('.iga-audio');
+  var btn=p.querySelector('.iga-btn');
+  var icon=p.querySelector('.iga-icon');
+  var wave=p.querySelector('.iga-wave');
+  var timeEl=p.querySelector('.iga-time');
+  var heights=[4,7,11,15,20,26,22,16,12,18,25,30,24,17,10,14,21,28,23,15,9,13,19,26,29,22,14,8,12,18,24,20,13,7,11,16,22,17,10,6];
+  heights.forEach(function(h){var b=document.createElement('div');b.className='iga-bar';b.style.height=h+'px';wave.appendChild(b);});
+  var bars=wave.querySelectorAll('.iga-bar');
+  function fmt(s){s=isFinite(s)?s:0;var m=Math.floor(s/60),sec=Math.floor(s%60);return m+':'+(sec<10?'0':'')+sec;}
+  function playIcon(){icon.innerHTML='<polygon points="0,0 12,7 0,14"/>';}
+  function pauseIcon(){icon.innerHTML='<rect x="1" y="0" width="3.5" height="14"/><rect x="7.5" y="0" width="3.5" height="14"/>';}
   function paint(){
-    var dur=audio.duration||0, prog=dur?audio.currentTime/dur:0, cut=Math.floor(prog*bars.length);
-    bars.forEach(function(b,i){ b.classList.toggle('played', i<cut); });
-    timeEl.textContent = fmt(audio.paused && audio.currentTime===0 ? dur : (dur-audio.currentTime));
+    var dur=audio.duration||0,prog=dur?audio.currentTime/dur:0,cut=Math.floor(prog*bars.length);
+    bars.forEach(function(b,i){b.classList.toggle('played',i<cut);});
+    timeEl.textContent=fmt(audio.paused&&audio.currentTime===0?dur:(dur-audio.currentTime));
   }
-  audio.addEventListener('loadedmetadata', function(){ timeEl.textContent=fmt(audio.duration); });
-  audio.addEventListener('timeupdate', paint);
-  audio.addEventListener('ended', function(){ playIcon(); audio.currentTime=0; paint(); timeEl.textContent=fmt(audio.duration); });
-  btn.addEventListener('click', function(){
-    if(audio.paused){ audio.play(); pauseIcon(); } else { audio.pause(); playIcon(); }
+  audio.addEventListener('loadedmetadata',function(){timeEl.textContent=fmt(audio.duration);});
+  audio.addEventListener('timeupdate',paint);
+  audio.addEventListener('ended',function(){playIcon();audio.currentTime=0;paint();timeEl.textContent=fmt(audio.duration);});
+  btn.addEventListener('click',function(){
+    if(audio.paused){audio.play();pauseIcon();}else{audio.pause();playIcon();}
   });
-  wave.addEventListener('click', function(e){
-    var r=wave.getBoundingClientRect(), dur=audio.duration||0;
-    audio.currentTime = Math.max(0,Math.min(1,(e.clientX-r.left)/r.width))*dur; paint();
+  wave.addEventListener('click',function(e){
+    var r=wave.getBoundingClientRect(),dur=audio.duration||0;
+    audio.currentTime=Math.max(0,Math.min(1,(e.clientX-r.left)/r.width))*dur;paint();
   });
 })();
 </script>
