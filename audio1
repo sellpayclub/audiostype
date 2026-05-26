@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Audio 1</title>
+<style>
+  html,body{margin:0;padding:0;background:transparent;overflow:hidden;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif;}
+  .ig-audio-player{
+    display:flex;align-items:center;gap:10px;
+    background:#7C3AED;border-radius:22px;
+    padding:8px 14px 8px 8px;max-width:300px;width:calc(100% - 8px);
+    box-sizing:border-box;user-select:none;margin:4px;
+  }
+  .iga-btn{
+    width:34px;height:34px;border-radius:50%;border:none;
+    background:rgba(255,255,255,.95);cursor:pointer;flex-shrink:0;
+    display:flex;align-items:center;justify-content:center;padding:0;
+  }
+  .iga-icon{width:14px;height:14px;fill:#7C3AED;display:block;}
+  .iga-wave{display:flex;align-items:center;gap:2px;flex:1;height:30px;cursor:pointer;}
+  .iga-bar{flex:1;min-width:2px;border-radius:3px;background:rgba(255,255,255,.4);transition:background .1s;}
+  .iga-bar.played{background:rgba(255,255,255,.95);}
+  .iga-time{font-size:12px;color:rgba(255,255,255,.95);flex-shrink:0;min-width:30px;font-variant-numeric:tabular-nums;}
+</style>
+</head>
+<body>
+<div class="ig-audio-player">
+  <button class="iga-btn" type="button" aria-label="play">
+    <svg class="iga-icon" viewBox="0 0 12 14"><polygon points="0,0 12,7 0,14"/></svg>
+  </button>
+  <div class="iga-wave"></div>
+  <span class="iga-time">0:00</span>
+  <audio class="iga-audio" preload="metadata" src="https://xyzgvsuttwrvbyyxdppq.supabase.co/storage/v1/object/public/audios%20mp3%20typebot/Audio1-app.mp3"></audio>
+</div>
+<script>
+(function(){
+  var p = document.querySelector('.ig-audio-player');
+  var audio = p.querySelector('.iga-audio');
+  var btn = p.querySelector('.iga-btn');
+  var icon = p.querySelector('.iga-icon');
+  var wave = p.querySelector('.iga-wave');
+  var timeEl = p.querySelector('.iga-time');
+
+  var heights = [4,7,11,15,20,26,22,16,12,18,25,30,24,17,10,14,21,28,23,15,9,13,19,26,29,22,14,8,12,18,24,20,13,7,11,16,22,17,10,6];
+  heights.forEach(function(h){
+    var b=document.createElement('div'); b.className='iga-bar'; b.style.height=h+'px'; wave.appendChild(b);
+  });
+  var bars = wave.querySelectorAll('.iga-bar');
+
+  function fmt(s){ s=isFinite(s)?s:0; var m=Math.floor(s/60),sec=Math.floor(s%60); return m+':'+(sec<10?'0':'')+sec; }
+  function playIcon(){ icon.innerHTML='<polygon points="0,0 12,7 0,14"/>'; }
+  function pauseIcon(){ icon.innerHTML='<rect x="1" y="0" width="3.5" height="14"/><rect x="7.5" y="0" width="3.5" height="14"/>'; }
+  function paint(){
+    var dur=audio.duration||0, prog=dur?audio.currentTime/dur:0, cut=Math.floor(prog*bars.length);
+    bars.forEach(function(b,i){ b.classList.toggle('played', i<cut); });
+    timeEl.textContent = fmt(audio.paused && audio.currentTime===0 ? dur : (dur-audio.currentTime));
+  }
+  audio.addEventListener('loadedmetadata', function(){ timeEl.textContent=fmt(audio.duration); });
+  audio.addEventListener('timeupdate', paint);
+  audio.addEventListener('ended', function(){ playIcon(); audio.currentTime=0; paint(); timeEl.textContent=fmt(audio.duration); });
+  btn.addEventListener('click', function(){
+    if(audio.paused){ audio.play(); pauseIcon(); } else { audio.pause(); playIcon(); }
+  });
+  wave.addEventListener('click', function(e){
+    var r=wave.getBoundingClientRect(), dur=audio.duration||0;
+    audio.currentTime = Math.max(0,Math.min(1,(e.clientX-r.left)/r.width))*dur; paint();
+  });
+})();
+</script>
+</body>
+</html>
